@@ -1,7 +1,9 @@
 const fs = require('fs');
 const http = require('http');
+
 const hostname = '127.0.0.1';
 const port = 3000;
+var file = "";
 
 class Vertex {
     constructor(x,y,dirt, bot) {
@@ -16,26 +18,44 @@ const server = http.createServer(function(req, res) {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'text/plain');
     
+    res.end("hello");
+    
+    if (req.url != '/favicon.ico') {
+        //array directions contains each line in an array	
+    }
+    
+});
 
-    //array directions contains each line in an array
+function init(){
     directions = parseFile();
     map = createRoom(directions);
     result = traverseRoom(map);
-
-    console.log(result[0], result[1]);
-    res.end("hello");
-});
-
+    console.log(result[0][0] + " " + result[0][1]);
+    console.log(result[1]);
+    /*console.log("Final Bot Position: " + result[0][0] + " " + result[0][1]);
+    console.log("Total Cleaned Tiles: " + result[1]);*/
+}
 
 server.listen(port, hostname, function() {
   console.log('Server running at http://'+ hostname + ':' + port + '/');
 });
 
+//get any files from the command line
+process.argv.forEach(function (val, index, array) {
+    
+    
+    if (index > 1){
+	file = val;
+	console.log("Testing with " + val);
+	init();
+    }
+});
+
 //parse the local file
 function parseFile() {
-    
+    if (file === "") file = "test.txt";
     try {  
-	var data = fs.readFileSync('file1.txt', 'utf8');
+	var data = fs.readFileSync(file, 'utf8');
 	return data.split('\n');
     } catch(e) {
 	console.log('Error:', e.stack);
@@ -49,7 +69,7 @@ function traverseRoom(map){
     var bounds = map[1];
     var route = map[2];
 
-    console.log(hMap,bounds, route)
+    //console.log(bounds, route)
     
     //now we need to follow the route to get the result
     var dirtCleaned = 0; // count of dirt patches cleaned
@@ -124,7 +144,7 @@ function traverseRoom(map){
 	default: 
 	    text = "Something went wrong. This shouldn't be here: " + route[i];    
 	}
-	console.log(botPos);
+	//console.log(botPos);
     }    
     return [botPos, dirtCleaned]
 }
@@ -184,9 +204,9 @@ function createRoom(directions){
 		    hMap.push(vertex);
 		}
 	    }
-	    console.log("first");
+	    //console.log("first");
 	} else if (i === 1){     //second line is hoover position
- 	    console.log("second");
+ 	    //console.log("second");
 	    botPos = directions[i].split(" ");
 	    var x = parseInt(botPos[0],10);
 	    var y = parseInt(botPos[1],10);
@@ -199,7 +219,7 @@ function createRoom(directions){
 	}else if (directions[i].match(/[nwes]/i)){ // direction line
 	    //store the directions for later
 	    route = directions[i].split('');
-	    console.log("direction");
+	    //console.log("direction");
 	}else{ //else it is a middle line and we need to finish drawing the map //dirt positions
 
 	    dirtPos = directions[i].split(" ");
@@ -211,7 +231,7 @@ function createRoom(directions){
 		    arrayItem.dirt = true;
 		}
 	    });
-	    console.log("map");
+	    //console.log("map");
 	}
     }
     
